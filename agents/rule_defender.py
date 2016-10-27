@@ -24,36 +24,23 @@ class RuleDefender():
         """
         detect player, enemy and ball position
         """
-        player = []
-        enemy = []
-        ball = []
+        player_color = [92, 186, 92]
+        enemy_color = [213, 130, 74]
+        ball_color = [236, 236, 236]
 
-        background = observation[1][1]  # take background color
         area = observation[35:194]  # cut game area
-        for c in background:
-            area[area == c] = 0  # drop the background
-        
-        found = False
-        for r in range(area.shape[0]):
-            for c in range(area.shape[1]):
-                if area[r][c][0] == 0:
-                    continue
-                if area[r][c][1] == 186:
-                    if len(player) == 0:
-                        player = (r, c)
-                elif area[r][c][0] == 213:
-                    if len(enemy) == 0:
-                        enemy = (r, c)
-                elif area[r][c][0] > 230:
-                    if len(ball) == 0:
-                        ball = (r, c)
 
-                if len(player) > 0 and len(enemy) > 0 and len(ball) > 0:
-                    found = True
-                    break
-            if found:
-                break
-        
+        player = self.search_position(area, player_color)
+        enemy = self.search_position(area, enemy_color)
+        ball = self.search_position(area, ball_color)
+
         #print("player:{} enemy:{} ball:{}".format(player, enemy, ball))
 
         return player, enemy, ball
+
+    def search_position(self, area, color):
+        position = []
+        index = np.where(area == color)
+        if len(index[0]) > 0:
+            position = [index[0][0], index[1][0]]
+        return position
